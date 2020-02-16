@@ -16,12 +16,12 @@ app.use(express.json());
 app.use(express.static("public"));
 
 var MONGODB_URI =
-  process.env.MONGODB_URI || "mongodb://localhost/mongoHeadlines";
+  process.env.MONGODB_URI || "mongodb://localhost:27017/mongoHeadlines";
 
-mongoose.connect(MONGODB_URI);
+mongoose.connect(MONGODB_URI, { useNewUrlParser: true });
 
 app.get("/scrape", function(req, res) {
-  axios.get("https://old.reddit.com/r/webdev/").then(function(response) {
+  axios.get("https://old.reddit.com/r/KingdomHearts/").then(function(response) {
     var $ = cheerio.load(response.data);
 
     $("p.title").each(function(i, element) {
@@ -57,7 +57,7 @@ app.get("/articles", function(req, res) {
 
 app.get("/articles/:id", function(req, res) {
   db.Article.findOne({ _id: req.params.id })
-    .populate("note")
+    .populate("comment")
     .then(function(dbArticle) {
       res.json(dbArticle);
     })
@@ -67,12 +67,12 @@ app.get("/articles/:id", function(req, res) {
 });
 
 app.post("/articles/:id", function(req, res) {
-  db.Note.create(req.body)
-    .then(function(dbNote) {
-      return db.Article.findOneAndUpdate(
+  db.Comment.create(req.body)
+    .then(function(dbComment) {
+      console.log(dbComment);
+      return db.Article.update(
         { _id: req.params.id },
-        { note: dbNote._id },
-        { new: true }
+        { $push: { comment: dbComment } }
       );
     })
     .then(function(dbArticle) {
