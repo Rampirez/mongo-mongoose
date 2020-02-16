@@ -30,6 +30,9 @@ $.getJSON("/articles", function(data) {
         console.log(data);
         // The title of the article
         $("#comments").append("<h2>" + data.title + "</h2>");
+        $("#comments").append("<h2>-------------------------</h2>");
+        $("#comments").append("<h2>Comments</h2>");
+        $("#comments").append("<h2>-------------------------</h2>");
         $("#comments").append("<div id='freshComments'></div>");
         // An input to enter a new title
         $("#comments").append("<input id='titleinput' name='title' >");
